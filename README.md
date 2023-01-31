@@ -21,7 +21,7 @@ Arguments:
 
 Options:
   -m, --message <MESSAGE>      Optional tag message
-  -d, --dry-run                Prints the next version without commiting anything
+  -d, --dry-run                Prints the next version without committing anything
   -h, --help                   Print help information (use `--help` for more detail)
 
 Examples:
@@ -37,6 +37,7 @@ fmt            Format bash code
 help           Display this help screen
 readme         Write README.md
 symlink        Add symlink to scripts in path
+tests          Tests utilities
 typos-fix      Fix typos
 typos          Show typos
 ```

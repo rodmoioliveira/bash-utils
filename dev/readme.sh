@@ -24,6 +24,7 @@ echo "fmt            Format bash code" >>README.md
 echo "help           Display this help screen" >>README.md
 echo "readme         Write README.md" >>README.md
 echo "symlink        Add symlink to scripts in path" >>README.md
+echo "tests          Tests utilities" >>README.md
 echo "typos-fix      Fix typos" >>README.md
 echo "typos          Show typos" >>README.md
 echo '```' >>README.md

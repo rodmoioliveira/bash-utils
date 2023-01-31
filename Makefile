@@ -15,6 +15,10 @@ readme: ## Write README.md
 symlink: ## Add symlink to scripts in path
 	@sudo ln -s -f $(shell pwd)/scripts/git-bump.sh /usr/local/bin/git-bump
 
+tests: ## Tests utilities
+	@./tests/test-git-bump.sh
+	@rm -rf /tmp/bash-utils-tests-*
+
 typos: ## Show typos
 	@typos
 
@@ -25,5 +29,6 @@ typos-fix: ## Fix typos
 .PHONY: fmt
 .PHONY: readme
 .PHONY: symlink
+.PHONY: tests
 .PHONY: typos
 .PHONY: typos-fix

@@ -25,7 +25,7 @@ Arguments:
 
 Options:
   -m, --message <MESSAGE>      Optional tag message
-  -d, --dry-run                Prints the next version without commiting anything
+  -d, --dry-run                Prints the next version without committing anything
   -h, --help                   Print help information (use `--help` for more detail)
 
 Examples:
@@ -55,7 +55,7 @@ Options:
           Optional tag message
 
   -d, --dry-run
-          Prints the next version without commiting anything
+          Prints the next version without committing anything
 
   -h, --help
           Print help information (use `-h` for a summary)
@@ -211,8 +211,8 @@ main() {
     parse_args "$@"
     validate_args
     check_semver
-    get_current_version
     is_git_dir
+    get_current_version
     get_semver
     bump_semver
     set_next_version
