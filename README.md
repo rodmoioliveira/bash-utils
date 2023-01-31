@@ -9,7 +9,7 @@
 ## git-bump
 
 ```sh
-git-bump --h
+git-bump -h
 
 Bumps the current tag version to the next version
 
@@ -33,11 +33,15 @@ Examples:
 # make recipes
 
 ```sh
+make help
+
+dependencies   Install dependencies
+fmt-check      Check format bash code
 fmt            Format bash code
 help           Display this help screen
 readme         Write README.md
 symlink        Add symlink to scripts in path
 tests          Tests utilities
+typos          Check typos
 typos-fix      Fix typos
-typos          Show typos
 ```
