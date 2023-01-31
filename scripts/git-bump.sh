@@ -25,7 +25,7 @@ Arguments:
 
 Options:
   -m, --message <MESSAGE>      Optional tag message
-  -d, --dry-run                Don't commit the tag version, just print the next version
+  -d, --dry-run                Prints the next version without commiting anything
   -h, --help                   Print help information (use `--help` for more detail)
 
 Examples:
@@ -55,7 +55,7 @@ Options:
           Optional tag message
 
   -d, --dry-run
-          Don't commit the tag version, just print the next version
+          Prints the next version without commiting anything
 
   -h, --help
           Print help information (use `-h` for a summary)
@@ -71,6 +71,12 @@ EOF
 }
 
 parse_args() {
+    if ! ARGS=$(getopt -a -n git-bump -o hdl:m: --long dry-run,help,level:,message: -- "$@"); then
+        printf 1>&2 "\nFor more information try '--help'\n"
+        exit 1
+    fi
+    eval set -- "$ARGS"
+
     while [ $# -gt 0 ]; do
         case "$1" in
         -h)
@@ -92,9 +98,39 @@ parse_args() {
         -d | --dry-run)
             readonly DRY_RUN=true
             ;;
+        --)
+            shift
+            break
+            ;;
+        *) usage_long ;;
         esac
         shift
     done
+}
+
+error_flag_level() {
+    printf 1>&2 "git-bump: '%s' isn't a valid value for '--level <RELEASE_LEVEL>'\n" "$RELEASE_LEVEL"
+    printf 1>&2 "  [possible values: patch, minor, major]\n\n"
+    printf 1>&2 "For more information try '--help'\n"
+    exit 1
+}
+
+error_not_git_dir() {
+    printf 1>&2 "%s is not a git repository\n" "$(pwd)"
+    exit 1
+}
+
+error_no_tags() {
+    printf 1>&2 "%s repo doesn't have any tag\n\n" "$(pwd)"
+    printf 1>&2 "You can create one like this:\n"
+    printf 1>&2 "git tag -a 0.1.0 -m \"version 0.1.0\"\n"
+    exit 1
+}
+
+validate_args() {
+    if [[ -z $RELEASE_LEVEL ]]; then
+        error_flag_level
+    fi
 }
 
 is_git_dir() {
@@ -103,17 +139,13 @@ is_git_dir() {
     if [[ -n $IS_GIT_DIR ]]; then
         readonly CURRENT_VERSION=$(git tag -l | tail -n1)
     else
-        printf 1>&2 "%s is not a git repository\n" "$(pwd)"
-        exit 1
+        error_not_git_dir
     fi
 }
 
 get_current_version() {
     if [[ -z $CURRENT_VERSION ]]; then
-        printf 1>&2 "%s repo doesn't have any tag\n\n" "$(pwd)"
-        printf 1>&2 "You can create one like this:\n"
-        printf 1>&2 "git tag -a 0.1.0 -m \"version 0.1.0\"\n"
-        exit 1
+        error_no_tags
     fi
 }
 
@@ -123,10 +155,7 @@ check_semver() {
     "minor") ;;
     "major") ;;
     *)
-        printf 1>&2 "error: '%s' isn't a valid value for '--level <RELEASE_LEVEL>'\n" "$RELEASE_LEVEL"
-        printf 1>&2 "  [possible values: patch, minor, major]\n\n"
-        usage_short
-        exit 1
+        error_flag_level
         ;;
     esac
 }
@@ -180,10 +209,10 @@ confirm() {
 
 main() {
     parse_args "$@"
-
-    is_git_dir
-    get_current_version
+    validate_args
     check_semver
+    get_current_version
+    is_git_dir
     get_semver
     bump_semver
     set_next_version

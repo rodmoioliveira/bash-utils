@@ -21,7 +21,7 @@ Arguments:
 
 Options:
   -m, --message <MESSAGE>      Optional tag message
-  -d, --dry-run                Don't commit the tag version, just print the next version
+  -d, --dry-run                Prints the next version without commiting anything
   -h, --help                   Print help information (use `--help` for more detail)
 
 Examples:
