@@ -128,6 +128,11 @@ error_no_tags() {
 }
 
 validate_args() {
+    if [[ -z $RELEASE_LEVEL && -z $MESSAGE && -z $DRY_RUN ]]; then
+        usage_long
+        exit 0
+    fi
+
     if [[ -z $RELEASE_LEVEL ]]; then
         error_flag_level
     fi

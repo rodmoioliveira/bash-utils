@@ -1,0 +1,39 @@
+name: Makefile CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  tests:
+    name: '[bash-utils] Test on ${{ matrix.os }}'
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+
+      matrix:
+        include:
+          - { os: ubuntu-latest }
+          - { os: macos-latest }
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Install dependencies ${{ matrix.os }}
+      run: make dependencies
+
+    - name:  Check format bash code ${{ matrix.os }}
+      run: make fmt-check
+
+    - name: Check typos ${{ matrix.os }}
+      run: make typos
+
+    - name: Add symlink to scripts in path ${{ matrix.os }}
+      run: make symlink
+
+    - name: Run tests ${{ matrix.os }}
+      run: source ~/.bash_profile; make tests
