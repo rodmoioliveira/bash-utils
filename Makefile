@@ -19,7 +19,10 @@ readme: ## Write README.md
 	@./dev/readme.sh
 
 symlink: ## Add symlink to scripts in path
-	@sudo ln -s -f $(shell pwd)/scripts/git-bump.sh /usr/local/bin/git-bump
+	@./dev/symlink.sh
+
+unsymlink: ## Remove symlink to scripts from path
+	@./dev/unsymlink.sh
 
 tests: ## Tests utilities
 	@fd test- -e sh tests | xargs -n1 bash
@@ -37,6 +40,7 @@ typos-fix: ## Fix typos
 .PHONY: fmt-check
 .PHONY: readme
 .PHONY: symlink
+.PHONY: unsymlink
 .PHONY: tests
 .PHONY: typos
 .PHONY: typos-fix
