@@ -1,5 +1,7 @@
 # bash-utils
 
+This is my collection of useful shell scripts for Linux and Mac.
+
 ## Installation
 
 To install all the scripts, run:
