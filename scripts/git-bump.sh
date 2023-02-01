@@ -30,7 +30,7 @@ Options:
   -h, --help                   Print help information (use `--help` for more detail)
 
 Examples:
-  git-bump -l patch -m "patch version"
+  git-bump -l patch -m "version %T"
   git-bump -l minor -d
   git-bump -l major
 EOF
@@ -62,7 +62,7 @@ Options:
           Print help information (use `-h` for a summary)
 
 Examples:
-  git-bump -l patch -m "patch version"
+  git-bump -l patch -m "version %T"
   git-bump -l minor -d
   git-bump -l major
 EOF
@@ -233,7 +233,15 @@ semver_next() {
     if [[ -z "$MESSAGE" ]]; then
         git tag -a "$NEXT_VERSION" -m "version $NEXT_VERSION" && confirm
     else
-        git tag -a "$NEXT_VERSION" -m "$MESSAGE" && confirm
+        str="$MESSAGE"
+        substr="%T"
+
+        if [[ $str == *"$substr"* ]]; then
+            message_template=$(echo "$MESSAGE" | sd '%T' "%s")
+            git tag -a "$NEXT_VERSION" -m "$(printf "$message_template" "$NEXT_VERSION")" && confirm
+        else
+            git tag -a "$NEXT_VERSION" -m "$MESSAGE" && confirm
+        fi
     fi
 }
 

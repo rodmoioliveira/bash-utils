@@ -47,14 +47,14 @@ assertions() {
     if ! assert_eq "0.2.0" "$(git-bump -dl minor 2>/dev/null)" "Should bump 0.1.0 to 0.2.0 (minor)"; then exit 1; fi
     if ! assert_eq "1.0.0" "$(git-bump -dl major 2>/dev/null)" "Should bump 0.1.0 to 1.0.0 (major)"; then exit 1; fi
 
-    git tag -d "$(git tag -l)"
-
+    git tag -d $(git tag -l)
     git tag -a "v0.1.0" -m "version v0.1.0"
+
     if ! assert_eq "v0.1.1" "$(git-bump -dl patch 2>/dev/null)" "Should bump v0.1.0 to v0.1.1 (patch)"; then exit 1; fi
     if ! assert_eq "v0.2.0" "$(git-bump -dl minor 2>/dev/null)" "Should bump v0.1.0 to v0.2.0 (minor)"; then exit 1; fi
     if ! assert_eq "v1.0.0" "$(git-bump -dl major 2>/dev/null)" "Should bump v0.1.0 to v1.0.0 (major)"; then exit 1; fi
 
-    git tag -d "$(git tag -l)"
+    git tag -d $(git tag -l)
     git tag -a 2 -m "version 2"
 
     git-bump -dl patch 2>/dev/null
@@ -69,28 +69,40 @@ assertions() {
     exit_st=$?
     if ! assert_eq 1 "$exit_st" "Exit code status should be 1 for command git-bump -dl major"; then exit 1; fi
 
-    git tag -d "$(git tag -l)"
-
+    git tag -d $(git tag -l)
     git tag -a "1.0.0-alpha.0valid" -m "version 1.0.0-alpha.0valid"
+
     git-bump -dl major 2>/dev/null
     exit_st=$?
     if ! assert_eq 1 "$exit_st" "Exit code status should be 1 for command git-bump -dl major"; then exit 1; fi
 
-    git tag -d "$(git tag -l)"
+    git tag -d $(git tag -l)
     git tag -a "1.0.0-alpha+beta" -m "version 1.0.0-alpha+beta"
+
     git-bump -dl major 2>/dev/null
     exit_st=$?
     if ! assert_eq 1 "$exit_st" "Exit code status should be 1 for command git-bump -dl major"; then exit 1; fi
 
-    git tag -d "$(git tag -l)"
+    git tag -d $(git tag -l)
+    git tag -a "v1.1.0" -m "version v1.1.0"
 
-    git tag -a "v0.1.0" -m "version v0.1.0"
-    if ! assert_eq "v0.1.1" "$(git-bump -l patch 2>/dev/null)" "Should bump v0.1.0 to v0.1.1 (patch)"; then exit 1; fi
-    if ! assert_eq "v0.2.0" "$(git-bump -l minor 2>/dev/null)" "Should bump v0.1.1 to v0.2.0 (minor)"; then exit 1; fi
-    if ! assert_eq "v1.0.0" "$(git-bump -l major 2>/dev/null)" "Should bump v0.2.0 to v1.0.0 (major)"; then exit 1; fi
-    if ! assert_eq "v2.0.0" "$(git-bump -l major 2>/dev/null)" "Should bump v1.0.0 to v2.0.0 (major)"; then exit 1; fi
-    if ! assert_eq "v2.0.1" "$(git-bump -l patch 2>/dev/null)" "Should bump v2.0.0 to v2.0.1 (patch)"; then exit 1; fi
-    if ! assert_eq "v2.1.0" "$(git-bump -l minor 2>/dev/null)" "Should bump v2.0.1 to v2.1.0 (minor)"; then exit 1; fi
+    if ! assert_eq "v1.1.1" "$(git-bump -l patch 2>/dev/null)" "Should bump v1.1.0 to v1.1.1 (patch)"; then exit 1; fi
+    if ! assert_eq "v1.2.0" "$(git-bump -l minor 2>/dev/null)" "Should bump v1.1.1 to v1.2.0 (minor)"; then exit 1; fi
+    if ! assert_eq "v2.0.0" "$(git-bump -l major 2>/dev/null)" "Should bump v1.2.0 to v2.0.0 (major)"; then exit 1; fi
+    if ! assert_eq "v3.0.0" "$(git-bump -l major 2>/dev/null)" "Should bump v2.0.0 to v3.0.0 (major)"; then exit 1; fi
+    if ! assert_eq "v3.0.1" "$(git-bump -l patch 2>/dev/null)" "Should bump v3.0.0 to v3.0.1 (patch)"; then exit 1; fi
+    if ! assert_eq "v3.1.0" "$(git-bump -l minor 2>/dev/null)" "Should bump v3.0.1 to v3.1.0 (minor)"; then exit 1; fi
+
+    git tag -d $(git tag -l)
+    git tag -a "v4.1.0" -m "version v4.1.0"
+
+    git-bump -l patch -m "Release version %T"
+    if ! assert_eq "Release version v4.1.1" "$(git tag -n99 | tail -n1 | awk '{print $2 " " $3 " " $4}')" "Last tag message should be 'Release version v4.1.1'"; then exit 1; fi
+
+    git-bump -l patch
+    if ! assert_eq "version v4.1.2" "$(git tag -n99 | tail -n1 | awk '{print $2 " " $3}')" "Last tag message should be 'version v4.1.2'"; then exit 1; fi
+
+    git tag -d $(git tag -l)
 }
 
 test() {
