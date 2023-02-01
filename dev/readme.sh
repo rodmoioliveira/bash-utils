@@ -42,7 +42,7 @@ $(./scripts/git-bump.sh 2>&1 -h)
 
 Completions for each script are available for the \`zsh\` shell in the
 [complete](https://github.com/rodmoioliveira/bash-utils/tree/main/complete) directory.
-To enable shell completion, copy the files to one of your \`\$fpath\` directories
+To enable shell completion, copy the files to one of your \`\$fpath\` directories.
 
 # make recipes
 
