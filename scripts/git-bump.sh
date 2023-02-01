@@ -4,7 +4,8 @@
 ##
 ## TITLE:         git-bump.sh
 ## AUTHOR:        Rodolfo Mói de Oliveira
-## DESCRIPTION:   Bumps the current tag version to the next version
+## DESCRIPTION:   Bump the current tag version to the next version
+##                accordingly to semantic versioning specifications.
 ## DATE:          27. Jan. 2023
 ## LICENSE:       MIT
 ##
@@ -15,13 +16,13 @@ set -eo pipefail
 usage_short() {
     HELP_TEXT=$(
         cat <<"EOF"
-Bumps the current tag version to the next version
+Bump the current tag version to the next version accordingly to semantic
+versioning specifications.
 
-Usage:
-  git-bump [OPTIONS] --level <RELEASE_LEVEL>
+Usage: git-bump [OPTIONS] --level <RELEASE_LEVEL>
 
 Arguments:
-  -l, --level <RELEASE_LEVEL>  The release level to bump the current version tag to [possible values: patch, minor, major]
+  -l, --level <RELEASE_LEVEL>  The release level to bump tag [possible values: patch, minor, major]
 
 Options:
   -m, --message <MESSAGE>      Optional tag message
@@ -41,14 +42,14 @@ EOF
 usage_long() {
     HELP_TEXT=$(
         cat <<"EOF"
-Bumps the current tag version to the next version
+Bump the current tag version to the next version accordingly to semantic
+versioning specifications
 
-Usage:
-  git-bump [OPTIONS] --level <RELEASE_LEVEL>
+Usage: git-bump [OPTIONS] --level <RELEASE_LEVEL>
 
 Arguments:
   -l, --level <RELEASE_LEVEL>
-          The release level to bump the current version tag to [possible values: patch, minor, major]
+          The release level to bump tag [possible values: patch, minor, major]
 
 Options:
   -m, --message <MESSAGE>

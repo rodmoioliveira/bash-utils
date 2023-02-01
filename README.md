@@ -21,13 +21,13 @@ make unsymlink
 ```sh
 git-bump -h
 
-Bumps the current tag version to the next version
+Bump the current tag version to the next version accordingly to semantic
+versioning specifications.
 
-Usage:
-  git-bump [OPTIONS] --level <RELEASE_LEVEL>
+Usage: git-bump [OPTIONS] --level <RELEASE_LEVEL>
 
 Arguments:
-  -l, --level <RELEASE_LEVEL>  The release level to bump the current version tag to [possible values: patch, minor, major]
+  -l, --level <RELEASE_LEVEL>  The release level to bump tag [possible values: patch, minor, major]
 
 Options:
   -m, --message <MESSAGE>      Optional tag message
@@ -42,6 +42,8 @@ Examples:
 
 # future scripts
 
+- [x] `git-bump` - Bump the current tag version to the next version accordingly to
+  semantic versioning specifications.
 - [ ] `git-dirty` - Recursively check your local git repositories for unstaged files.
 - [ ] `git-changelog` - Recursively generate CHANGELOG files for your git repositories.
 

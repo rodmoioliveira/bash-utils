@@ -31,6 +31,8 @@ $(./scripts/git-bump.sh 2>&1 -h)
 
 # future scripts
 
+- [x] \`git-bump\` - Bump the current tag version to the next version accordingly to
+  semantic versioning specifications.
 - [ ] \`git-dirty\` - Recursively check your local git repositories for unstaged files.
 - [ ] \`git-changelog\` - Recursively generate CHANGELOG files for your git repositories.
 
