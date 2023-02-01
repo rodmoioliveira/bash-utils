@@ -15,7 +15,6 @@ install_linux() {
 install_mac() {
     brew install kdabir/tap/has
     brew install shfmt
-    curl https://sh.rustup.rs -sSf | sh -s -- -y
     brew install sd
     brew install fd
     brew install ripgrep
