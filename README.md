@@ -35,7 +35,7 @@ Options:
   -h, --help                   Print help information (use `--help` for more detail)
 
 Examples:
-  git-bump -l patch -m "patch version"
+  git-bump -l patch -m "version %T"
   git-bump -l minor -d
   git-bump -l major
 ```
