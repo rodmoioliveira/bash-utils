@@ -2,7 +2,7 @@
 
 _git-bump() {
   _arguments -s \
-    {-l,--level=}'[The release level to bump the current version tag to]:RELEASE_LEVEL:((patch minor major))' \
+    {-l,--level=}'[The release level to bump tag]:RELEASE_LEVEL:((patch minor major))' \
     {-d,--dry-run}'[Prints the next version without committing anything]' \
     {-m,--message=}'[Optional tag message]:MESSAGE' \
     '(: - *)'{-h,--help}'[Print help information]'
