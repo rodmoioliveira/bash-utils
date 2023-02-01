@@ -70,7 +70,9 @@ EOF
     printf 1>&2 "%s\n" "$HELP_TEXT"
 }
 
-parse_args() {
+readonly SEMVER_REGEX='^(?P<v>v)?(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$'
+
+args_parse() {
     if ! ARGS=$(getopt -a -n git-bump -o hdl:m: --long dry-run,help,level:,message: -- "$@"); then
         printf 1>&2 "\nFor more information try '--help'\n"
         exit 1
@@ -108,7 +110,7 @@ parse_args() {
     done
 }
 
-error_flag_level() {
+error_release() {
     printf 1>&2 "git-bump: '%s' isn't a valid value for '--level <RELEASE_LEVEL>'\n" "$RELEASE_LEVEL"
     printf 1>&2 "  [possible values: patch, minor, major]\n\n"
     printf 1>&2 "For more information try '--help'\n"
@@ -120,21 +122,37 @@ error_not_git_dir() {
     exit 1
 }
 
-error_no_tags() {
+error_no_semver() {
     printf 1>&2 "%s repo doesn't have any tag\n\n" "$(pwd)"
     printf 1>&2 "You can create one like this:\n"
     printf 1>&2 "git tag -a 0.1.0 -m \"version 0.1.0\"\n"
     exit 1
 }
 
-validate_args() {
+error_prerelease_buildmetadata() {
+    printf 1>&2 "git-bump: bump fail because tag '%s' has additional info.\n\n" "$CURRENT_VERSION"
+    printf 1>&2 "      prerelease: '%s'\n" "$prerelease"
+    printf 1>&2 "   buildmetadata: '%s'\n" "$buildmetadata"
+    exit 1
+}
+
+error_invalid_semver() {
+    printf 1>&2 "git-bump: last version '%s' isn't a valid semantic version tag.\n" "$CURRENT_VERSION"
+    printf 1>&2 "For more info, visit https://semver.org/\n\n"
+    printf 1>&2 "You can rename the tag with:\n"
+    printf 1>&2 "git tag new old\n"
+    printf 1>&2 "git tag -d old\n"
+    exit 1
+}
+
+args_validate() {
     if [[ -z $RELEASE_LEVEL && -z $MESSAGE && -z $DRY_RUN ]]; then
         usage_long
         exit 0
     fi
 
     if [[ -z $RELEASE_LEVEL ]]; then
-        error_flag_level
+        error_release
     fi
 }
 
@@ -148,30 +166,43 @@ is_git_dir() {
     fi
 }
 
-get_current_version() {
+semver_get() {
     if [[ -z $CURRENT_VERSION ]]; then
-        error_no_tags
+        error_no_semver
     fi
 }
 
-check_semver() {
+release_check() {
     case $RELEASE_LEVEL in
     "patch") ;;
     "minor") ;;
     "major") ;;
     *)
-        error_flag_level
+        error_release
         ;;
     esac
 }
 
-get_semver() {
-    major=$(echo "$CURRENT_VERSION" | sd '(\d{1,})\.(\d{1,})\.(\d{1,})' '${1}')
-    minor=$(echo "$CURRENT_VERSION" | sd '(\d{1,})\.(\d{1,})\.(\d{1,})' '${2}')
-    patch=$(echo "$CURRENT_VERSION" | sd '(\d{1,})\.(\d{1,})\.(\d{1,})' '${3}')
+semver_validate() {
+    if ! echo "$CURRENT_VERSION" | rg "$SEMVER_REGEX" >/dev/null; then
+        error_invalid_semver
+    fi
 }
 
-bump_semver() {
+semver_parse() {
+    v=$(echo "$CURRENT_VERSION" | sd "$SEMVER_REGEX" '${v}')
+    major=$(echo "$CURRENT_VERSION" | sd "$SEMVER_REGEX" '${major}')
+    minor=$(echo "$CURRENT_VERSION" | sd "$SEMVER_REGEX" '${minor}')
+    patch=$(echo "$CURRENT_VERSION" | sd "$SEMVER_REGEX" '${patch}')
+    prerelease=$(echo "$CURRENT_VERSION" | sd "$SEMVER_REGEX" '${prerelease}')
+    buildmetadata=$(echo "$CURRENT_VERSION" | sd "$SEMVER_REGEX" '${buildmetadata}')
+
+    if [[ -n $prerelease || -n $buildmetadata ]]; then
+        error_prerelease_buildmetadata
+    fi
+}
+
+semver_bump() {
     case $RELEASE_LEVEL in
     "patch")
         patch=$((patch + 1))
@@ -187,13 +218,13 @@ bump_semver() {
         ;;
     esac
 
-    readonly NEXT_VERSION="$major.$minor.$patch"
+    readonly NEXT_VERSION="$v$major.$minor.$patch"
 }
 
-set_next_version() {
+semver_next() {
     if [[ "$DRY_RUN" == true ]]; then
         printf 1>&2 "Current version is %s\n" "$CURRENT_VERSION"
-        printf 1>&2 "Semantic Versioning will be bumped to %s\n" "$NEXT_VERSION"
+        printf 1>&2 "Semantic version will be bumped to %s\n" "$NEXT_VERSION"
         printf "%s\n" "$NEXT_VERSION"
         exit 0
     fi
@@ -213,14 +244,15 @@ confirm() {
 }
 
 main() {
-    parse_args "$@"
-    validate_args
-    check_semver
+    args_parse "$@"
+    args_validate
+    release_check
     is_git_dir
-    get_current_version
-    get_semver
-    bump_semver
-    set_next_version
+    semver_get
+    semver_validate
+    semver_parse
+    semver_bump
+    semver_next
 }
 
 main "$@"
