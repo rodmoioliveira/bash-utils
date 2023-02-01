@@ -103,6 +103,8 @@ assertions() {
     if ! assert_eq "version v4.1.2" "$(git tag -n99 | tail -n1 | awk '{print $2 " " $3}')" "Last tag message should be 'version v4.1.2'"; then exit 1; fi
 
     git tag -d $(git tag -l)
+
+    rm -rf "$tmp_dir"
 }
 
 test() {

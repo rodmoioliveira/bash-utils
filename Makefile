@@ -26,7 +26,6 @@ unsymlink: ## Remove symlink to scripts from path
 
 tests: ## Tests utilities
 	@fd test- -e sh tests | xargs -n1 bash
-	@rm -rf /tmp/bash-utils-tests-*
 
 typos: ## Check typos
 	@typos
