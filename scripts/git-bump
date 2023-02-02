@@ -1,0 +1,277 @@
+#!/bin/bash
+
+#########################################################################
+##
+## TITLE:         git-bump
+## AUTHOR:        Rodolfo Mói de Oliveira
+## DESCRIPTION:   Bump the current tag version to the next version
+##                accordingly to semantic versioning specifications.
+## DATE:          27. Jan. 2023
+## LICENSE:       MIT
+##
+#########################################################################
+
+declare TRACE
+[[ "${TRACE}" == 1 ]] && set -o xtrace
+set -o errexit
+set -o nounset
+set -o pipefail
+set -o noclobber
+
+usage_short() {
+  local help_text
+  help_text=$(
+    cat <<"EOF"
+Bump the current tag version to the next version accordingly to semantic
+versioning specifications.
+
+Usage: git-bump [OPTIONS] --level <RELEASE_LEVEL>
+
+Arguments:
+  -l, --level <RELEASE_LEVEL>  The release level to bump tag [possible values: patch, minor, major]
+
+Options:
+  -m, --message <MESSAGE>      Optional tag message
+  -d, --dry-run                Prints the next version without committing anything
+  -h, --help                   Print help information (use `--help` for more detail)
+
+Examples:
+  git-bump -l patch -m "version %T"
+  git-bump -l minor -d
+  git-bump -l major
+EOF
+  )
+
+  printf 1>&2 "%s\n" "${help_text}"
+}
+
+usage_long() {
+  local help_text
+  help_text=$(
+    cat <<"EOF"
+Bump the current tag version to the next version accordingly to semantic
+versioning specifications
+
+Usage: git-bump [OPTIONS] --level <RELEASE_LEVEL>
+
+Arguments:
+  -l, --level <RELEASE_LEVEL>
+          The release level to bump tag [possible values: patch, minor, major]
+
+Options:
+  -m, --message <MESSAGE>
+          Optional tag message
+
+  -d, --dry-run
+          Prints the next version without committing anything
+
+  -h, --help
+          Print help information (use `-h` for a summary)
+
+Examples:
+  git-bump -l patch -m "version %T"
+  git-bump -l minor -d
+  git-bump -l major
+EOF
+  )
+
+  printf 1>&2 "%s\n" "${help_text}"
+}
+
+declare DRY_RUN=false
+declare MESSAGE=''
+declare RELEASE_LEVEL=''
+declare -r SEMVER_REGEX='^(?P<v>v)?(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$'
+
+args_parse() {
+  local args
+  if ! args=$(getopt -a -n git-bump -o hdl:m: --long dry-run,help,level:,message: -- "$@"); then
+    printf 1>&2 "\nFor more information try '--help'\n"
+    exit 1
+  fi
+  eval set -- "${args}"
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+    -h)
+      usage_short
+      exit 0
+      ;;
+    --help)
+      usage_long
+      exit 0
+      ;;
+    -l | --level)
+      shift
+      RELEASE_LEVEL="$1"
+      ;;
+    -m | --message)
+      shift
+      MESSAGE="$1"
+      ;;
+    -d | --dry-run)
+      DRY_RUN=true
+      ;;
+    --)
+      shift
+      break
+      ;;
+    *) usage_long ;;
+    esac
+    shift
+  done
+}
+
+error_release() {
+  printf 1>&2 "git-bump: '%s' isn't a valid value for '--level <RELEASE_LEVEL>'\n" "${RELEASE_LEVEL}"
+  printf 1>&2 "  [possible values: patch, minor, major]\n\n"
+  printf 1>&2 "For more information try '--help'\n"
+  exit 1
+}
+
+error_not_git_dir() {
+  printf 1>&2 "%s is not a git repository\n" "$(pwd)"
+  exit 1
+}
+
+error_no_semver() {
+  printf 1>&2 "%s repo doesn't have any tag\n\n" "$(pwd)"
+  printf 1>&2 "You can create one like this:\n"
+  printf 1>&2 "git tag -a 0.1.0 -m \"version 0.1.0\"\n"
+  exit 1
+}
+
+error_prerelease_buildmetadata() {
+  printf 1>&2 "git-bump: bump fail because tag '%s' has additional info.\n\n" "${CURRENT_VERSION}"
+  printf 1>&2 "      prerelease: '%s'\n" "${prerelease}"
+  printf 1>&2 "   buildmetadata: '%s'\n" "${buildmetadata}"
+  exit 1
+}
+
+error_invalid_semver() {
+  printf 1>&2 "git-bump: last version '%s' isn't a valid semantic version tag.\n" "${CURRENT_VERSION}"
+  printf 1>&2 "For more info, visit https://semver.org/\n\n"
+  printf 1>&2 "You can rename the tag with:\n"
+  printf 1>&2 "git tag new old\n"
+  printf 1>&2 "git tag -d old\n"
+  exit 1
+}
+
+args_validate() {
+  if [[ -z "${RELEASE_LEVEL}" && -z "${MESSAGE}" && "${DRY_RUN}" == false ]]; then
+    usage_long
+    exit 0
+  fi
+
+  if [[ -z "${RELEASE_LEVEL}" ]]; then
+    error_release
+  fi
+}
+
+git_dir_check() {
+  local -r is_git_dir=$(git rev-parse --git-dir 2>/dev/null)
+
+  if [[ -n "${is_git_dir}" ]]; then
+    CURRENT_VERSION=$(git tag -l | tail -n1)
+  else
+    error_not_git_dir
+  fi
+}
+
+semver_get() {
+  if [[ -z "${CURRENT_VERSION}" ]]; then
+    error_no_semver
+  fi
+}
+
+release_check() {
+  case "${RELEASE_LEVEL}" in
+  "patch") ;;
+  "minor") ;;
+  "major") ;;
+  *) error_release ;;
+  esac
+}
+
+semver_validate() {
+  if ! printf "%s" "${CURRENT_VERSION}" | rg "${SEMVER_REGEX}" >/dev/null; then
+    error_invalid_semver
+  fi
+}
+
+semver_parse() {
+  v=$(printf "%s" "${CURRENT_VERSION}" | sd "${SEMVER_REGEX}" '${v}')
+  major=$(printf "%s" "${CURRENT_VERSION}" | sd "${SEMVER_REGEX}" '${major}')
+  minor=$(printf "%s" "${CURRENT_VERSION}" | sd "${SEMVER_REGEX}" '${minor}')
+  patch=$(printf "%s" "${CURRENT_VERSION}" | sd "${SEMVER_REGEX}" '${patch}')
+  prerelease=$(printf "%s" "${CURRENT_VERSION}" | sd "${SEMVER_REGEX}" '${prerelease}')
+  buildmetadata=$(printf "%s" "${CURRENT_VERSION}" | sd "${SEMVER_REGEX}" '${buildmetadata}')
+
+  if [[ -n "${prerelease}" || -n "${buildmetadata}" ]]; then
+    error_prerelease_buildmetadata
+  fi
+}
+
+semver_bump() {
+  case "${RELEASE_LEVEL}" in
+  "patch")
+    patch=$((patch + 1))
+    ;;
+  "minor")
+    minor=$((minor + 1))
+    patch=0
+    ;;
+  "major")
+    major=$((major + 1))
+    minor=0
+    patch=0
+    ;;
+  *) error_release ;;
+  esac
+
+  readonly NEXT_VERSION="${v}${major}.${minor}.${patch}"
+}
+
+semver_next() {
+  if ${DRY_RUN}; then
+    printf 1>&2 "Current version is %s\n" "${CURRENT_VERSION}"
+    printf 1>&2 "Semantic version will be bumped to %s\n" "${NEXT_VERSION}"
+    printf "%s\n" "${NEXT_VERSION}"
+    exit 0
+  fi
+
+  if [[ -z "${MESSAGE}" ]]; then
+    git tag -a "${NEXT_VERSION}" -m "version ${NEXT_VERSION}" && confirm
+  else
+    str="${MESSAGE}"
+    substr="%T"
+
+    if [[ "${str}" == *"${substr}"* ]]; then
+      message_template=$(printf "%s" "${MESSAGE}" | sd '%T' "%s")
+      git tag -a "${NEXT_VERSION}" -m "$(printf "${message_template}" "${NEXT_VERSION}")" && confirm
+    else
+      git tag -a "${NEXT_VERSION}" -m "${MESSAGE}" && confirm
+    fi
+  fi
+}
+
+confirm() {
+  printf 1>&2 "Last version was %s\n" "${CURRENT_VERSION}"
+  printf 1>&2 "Current version now is %s\n" "${NEXT_VERSION}"
+  printf "%s\n" "${NEXT_VERSION}"
+  exit 0
+}
+
+main() {
+  args_parse "$@"
+  args_validate
+  release_check
+  git_dir_check
+  semver_get
+  semver_validate
+  semver_parse
+  semver_bump
+  semver_next
+}
+
+main "$@"

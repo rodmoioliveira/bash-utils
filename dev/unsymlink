@@ -1,0 +1,21 @@
+#!/bin/bash
+
+declare TRACE
+[[ "${TRACE}" == 1 ]] && set -o xtrace
+set -o errexit
+set -o nounset
+set -o pipefail
+set -o noclobber
+
+unsymlink() {
+  local -a scripts
+  while IFS= read -r line; do scripts+=("${line}"); done < <(rg '^#!/bin/bash$' -l scripts | awk -F'/' '{print $2}')
+  for script in "${scripts[@]}"; do
+    local path=/usr/local/bin/"${script}"
+    printf 1>&2 "Uninstalling %s from %s ...\n" "${script}" "${path}"
+    sudo rm "${path}"
+  done
+  printf 1>&2 "Done!\n"
+}
+
+trap unsymlink EXIT
