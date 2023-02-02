@@ -6,26 +6,31 @@ help: ## Display this help screen
 		{printf "%-14s %s\n", $$1, $$2}' | \
 		sort
 
+all-check: fmt-check lint-check readme typos tests ## Run all checks
+
 dependencies: ## Install dependencies
-	@./dev/dependencies.sh
+	@./dev/dependencies
 
 fmt: ## Format bash code
-	@fd . -e sh --absolute-path | xargs shfmt -i 4 -w
+	@fd . -t f dev scripts tests --absolute-path | xargs shfmt -i 2 -w
 
 fmt-check: ## Check format bash code
-	@fd . -e sh --absolute-path | xargs shfmt -i 4 -d
+	@fd . -t f dev scripts tests --absolute-path | xargs shfmt -i 2 -d
 
 readme: ## Write README.md
-	@./dev/readme.sh
+	@./dev/readme
+
+lint-check: ## Check lint bash code
+	@fd . -t f dev scripts tests --absolute-path | rg assert -v | xargs shellcheck -o all
 
 symlink: ## Add symlink to scripts in path
-	@./dev/symlink.sh
+	@./dev/symlink
 
 unsymlink: ## Remove symlink to scripts from path
-	@./dev/unsymlink.sh
+	@./dev/unsymlink
 
 tests: ## Tests utilities
-	@fd test- -e sh tests | xargs -n1 bash
+	@fd test- tests | xargs -n1 bash
 
 typos: ## Check typos
 	@typos
@@ -34,10 +39,12 @@ typos-fix: ## Fix typos
 	@typos -w
 
 .PHONY: help
+.PHONY: all-check
 .PHONY: dependencies
 .PHONY: fmt
 .PHONY: fmt-check
 .PHONY: readme
+.PHONY: lint-check
 .PHONY: symlink
 .PHONY: unsymlink
 .PHONY: tests

@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [ "main" ]
 
+env:
+  TRACE: 1
+
 jobs:
   tests:
     name: '[bash-utils] Test on ${{ matrix.os }}'
@@ -28,6 +31,9 @@ jobs:
 
     - name:  Check format bash code ${{ matrix.os }}
       run: make fmt-check
+
+    - name:  Check lint bash code ${{ matrix.os }}
+      run: make lint-check
 
     - name: Check typos ${{ matrix.os }}
       run: make typos

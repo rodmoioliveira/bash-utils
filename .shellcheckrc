@@ -1,0 +1,19 @@
+# Can't follow non-constant source. Use a directive to specify location.
+# https://github.com/koalaman/shellcheck/wiki/SC1090
+disable=SC1090
+
+# Not following: (error message here)
+# https://github.com/koalaman/shellcheck/wiki/SC1091
+disable=SC1091
+
+# Expressions don't expand in single quotes, use double quotes for that.
+# https://github.com/koalaman/shellcheck/wiki/SC2016
+disable=SC2016
+
+# Consider invoking this command separately to avoid masking its return value (or use '|| true' to ignore).
+# https://github.com/koalaman/shellcheck/wiki/SC2312
+disable=SC2312
+
+# Don't use variables in the printf format string. Use printf "..%s.." "$foo".
+# https://github.com/koalaman/shellcheck/wiki/SC2059
+disable=SC2059
