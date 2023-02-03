@@ -82,13 +82,12 @@ unsymlink      Remove symlink to scripts from path
 - [Google Shell Style Guide](https://google.github.io/styleguide/shellguide.html)
 
 # reference
-- [Bash Declare Command](https://linuxhint.com/bash_declare_command/)
 - [Bash Reference Manual](https://www.gnu.org/savannah-checkouts/gnu/bash/manual/bash.html)
 - [Bash script setup](https://caiustheory.com/bash-script-setup/)
+- [Use Bash Strict Mode (Unless You Love Debugging)](http://redsymbol.net/articles/unofficial-bash-strict-mode/)
 - [How "Exit Traps" Can Make Your Bash Scripts Way More Robust And Reliable](http://redsymbol.net/articles/bash-exit-traps/)
 - [How can I read a file (data stream, variable) line-by-line (and/or field-by-field)?](http://mywiki.wooledge.org/BashFAQ/001)
 - [Obsolete and deprecated syntax](https://wiki.bash-hackers.org/scripting/obsolete)
 - [Portability talk](https://wiki.bash-hackers.org/scripting/nonportable)
-- [Use Bash Strict Mode (Unless You Love Debugging)](http://redsymbol.net/articles/unofficial-bash-strict-mode/)
 - [Using Trap to Exit Bash Scripts Cleanly](https://www.putorius.net/using-trap-to-exit-bash-scripts-cleanly.html)
-- [https://ricma.co/posts/tech/tutorials/bash-tip-tricks/](https://ricma.co/posts/tech/tutorials/bash-tip-tricks/)
+- [Bash | Tips & Tricks I would have wanted to know when I started](https://ricma.co/posts/tech/tutorials/bash-tip-tricks/)
