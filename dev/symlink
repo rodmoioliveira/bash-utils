@@ -12,8 +12,8 @@ symlink() {
   while IFS= read -r line; do scripts+=("${line}"); done < <(rg '^#!/bin/bash$' -l scripts | awk -F'/' '{print $2}')
   for script in "${scripts[@]}"; do
     local path=/usr/local/bin/"${script}"
-    printf 1>&2 "Installing %s in %s ...\n" "${script}" "${path}"
     sudo ln -s -f "$(pwd)"/scripts/"${script}" "${path}"
+    printf 1>&2 "Installing %s in %s ...\n" "${script}" "${path}"
   done
   printf 1>&2 "Done!\n"
 }

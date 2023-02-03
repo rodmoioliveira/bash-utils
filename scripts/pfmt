@@ -1,0 +1,210 @@
+#!/bin/bash
+
+#########################################################################
+##
+## TITLE:         pfmt
+## AUTHOR:        Rodolfo Mói de Oliveira
+## DESCRIPTION:   Format plain text with sd.
+## DATE:          27. Jan. 2023
+## LICENSE:       MIT
+##
+#########################################################################
+
+declare TRACE
+[[ "${TRACE}" == 1 ]] && set -o xtrace
+set -o errexit
+set -o nounset
+set -o pipefail
+set -o noclobber
+
+usage_short() {
+  local help_text
+  help_text=$(
+    cat <<"EOF"
+Format plain text with sd.
+
+Usage:
+  pfmt [OPTIONS] [FILES]...
+  pfmt [OPTIONS] <<(echo <TEXT>)
+
+Arguments:
+  [FILES]...  A list of space-separated FILES as positional arguments
+  <TEXT>      A TEXT from standard input
+
+Options:
+  -h, --help  Print help information (use `--help` for more detail)
+EOF
+  )
+
+  printf 1>&2 "%s\n" "${help_text}"
+}
+
+usage_long() {
+  local help_text
+  help_text=$(
+    cat <<"EOF"
+Format plain text with sd.
+
+Usage:
+  pfmt [OPTIONS] [FILES]...
+  pfmt [OPTIONS] <<(echo <TEXT>)
+
+Arguments:
+  [FILES]...
+          A list of space-separated FILES as positional arguments
+
+  <TEXT>
+          A TEXT from standard input
+
+Options:
+  -h, --help
+          Print help information (use `-h` for a summary)
+
+Formatting Rules:
+  - Enforce a single space between words.
+  - Remove spaces between words and punctuation.
+  - Add only one space between punctuation and words.
+  - Remove spaces surrounding words inside square brackets, brackets, and parentheses.
+  - Trim the spaces at the end of the line.
+  - Add double spaces between sentences.
+
+Examples (positional arguments):
+  find . -type f -name "*.md" | xargs pfmt
+  pfmt *.md
+
+Examples (standard input):
+  pfmt <<(echo "some text to format...")
+  cat README.md | pfmt
+  echo "some text to format..." | pfmt
+EOF
+  )
+
+  printf 1>&2 "%s\n" "${help_text}"
+}
+
+args_parse() {
+  local args
+  if ! args=$(getopt -a -n pfmt -o h --long help -- "$@"); then
+    printf 1>&2 "\nFor more information try '--help'\n"
+    exit 1
+  fi
+  eval set -- "${args}"
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+    -h)
+      usage_short
+      exit 0
+      ;;
+    --help)
+      usage_long
+      exit 0
+      ;;
+    --)
+      shift
+      break
+      ;;
+    *) usage_long ;;
+    esac
+    shift
+  done
+
+  if [[ -p /dev/stdin ]]; then
+    is_stdin=true
+    input="$(cat -)"
+    if [[ -z "${input}" ]]; then
+      usage_long
+      exit 0
+    fi
+
+  else
+    is_stdin=false
+    input=()
+    while IFS= read -r i; do input+=("${i}"); done < <(echo "$@")
+    if [[ -z "${input[*]}" ]]; then
+      usage_long
+      exit 0
+    fi
+  fi
+
+}
+
+apply_positional() {
+  # - Enforce a single space between words.
+  # shellcheck disable=SC2048,SC2086
+  sd '(\w) {2,}(\w)' '${1} ${2}' ${input[*]}
+
+  # - Remove spaces between words and punctuation.
+  # shellcheck disable=SC2048,SC2086
+  sd '(\w) +([:\?!\.;,])' '${1}${2}' ${input[*]}
+
+  # - Add only one space between punctuation and words.
+  # shellcheck disable=SC2048,SC2086
+  sd '([:;,]) +(\w)' '${1} ${2}' ${input[*]}
+
+  # - Remove spaces surrounding words inside square brackets, brackets, and parentheses.
+  # shellcheck disable=SC2048,SC2086
+  sd '\( {1,}(\w)' '(${1}' ${input[*]}
+  # shellcheck disable=SC2048,SC2086
+  sd '(\w) {1,}\)' '${1})' ${input[*]}
+  # shellcheck disable=SC2048,SC2086
+  sd '\[ {1,}(\w)' '[${1}' ${input[*]}
+  # shellcheck disable=SC2048,SC2086
+  sd '(\w) {1,}\]' '${1}]' ${input[*]}
+  # shellcheck disable=SC2048,SC2086
+  sd '\{ {1,}(\w)' '{${1}' ${input[*]}
+  # shellcheck disable=SC2048,SC2086
+  sd '(\w) {1,}\}' '${1}}' ${input[*]}
+  # shellcheck disable=SC2048,SC2086
+  sd '(\w[\}\)\]]) +([:\?!\.;,])' '${1}${2}' ${input[*]}
+  # shellcheck disable=SC2048,SC2086
+  sd '([\}\)\]]) +([\w&])' '${1} ${2}' ${input[*]}
+
+  # - Trim the spaces at the end of the line.
+  # shellcheck disable=SC2048,SC2086
+  sd '( {1,}$)' '' ${input[*]}
+
+  # - Add double spaces between sentences.
+  # shellcheck disable=SC2048,SC2086
+  sd '([^A-Z0-9][\.\?!]) {0,}([A-Z])' '$1  $2' ${input[*]}
+}
+
+apply_stdin() {
+  printf "%s\n" "${input}" |
+    # - Enforce a single space between words.
+    sd '(\w) {2,}(\w)' '${1} ${2}' |
+
+    # - Remove spaces between words and punctuation.
+    sd '(\w) +([:\?!\.;,])' '${1}${2}' |
+
+    # - Add only one space between punctuation and words.
+    sd '([:;,]) +(\w)' '${1} ${2}' |
+
+    # - Remove spaces surrounding words inside square brackets, brackets, and parentheses.
+    sd '\( {1,}(\w)' '(${1}' |
+    sd '(\w) {1,}\)' '${1})' |
+    sd '\[ {1,}(\w)' '[${1}' |
+    sd '(\w) {1,}\]' '${1}]' |
+    sd '\{ {1,}(\w)' '{${1}' |
+    sd '(\w) {1,}\}' '${1}}' |
+    sd '(\w[\}\)\]]) +([:\?!\.;,])' '${1}${2}' |
+    sd '([\}\)\]]) +([\w&])' '${1} ${2}' |
+
+    # - Trim the spaces at the end of the line.
+    sd '( {1,}$)' '' |
+
+    # - Add double spaces between sentences.
+    sd '([^A-Z0-9][\.\?!]) {0,}([A-Z])' '$1  $2'
+}
+
+main() {
+  args_parse "$@"
+
+  if [[ "${is_stdin}" == true ]]; then
+    apply_stdin
+  else
+    apply_positional
+  fi
+}
+
+main "$@"
