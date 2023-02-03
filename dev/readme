@@ -33,16 +33,25 @@ make unsymlink
 
 # available scripts
 
+## pfmt
+
+\`\`\`sh
+pfmt --help
+
+$(./scripts/pfmt 2>&1 --help)
+\`\`\`
+
 ## git-bump
 
 \`\`\`sh
-git-bump -h
+git-bump --help
 
-$(./scripts/git-bump 2>&1 -h)
+$(./scripts/git-bump 2>&1 --help)
 \`\`\`
 
 # future scripts
 
+- [x] \`pfmt\` - Format plain text with sd.
 - [x] \`git-bump\` - Bump the current tag version to the next version accordingly to
   semantic versioning specifications.
 - [ ] \`git-dirty\` - Recursively check your local git repositories for unstaged files.

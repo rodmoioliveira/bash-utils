@@ -20,23 +20,69 @@ make unsymlink
 
 # available scripts
 
+## pfmt
+
+```sh
+pfmt --help
+
+Format plain text with sd.
+
+Usage:
+  pfmt [OPTIONS] [FILES]...
+  pfmt [OPTIONS] <<(echo <TEXT>)
+
+Arguments:
+  [FILES]...
+          A list of space-separated FILES as positional arguments
+
+  <TEXT>
+          A TEXT from standard input
+
+Options:
+  -h, --help
+          Print help information (use `-h` for a summary)
+
+Formatting Rules:
+  - Enforce a single space between words.
+  - Remove spaces between words and punctuation.
+  - Add only one space between punctuation and words.
+  - Remove spaces surrounding words inside square brackets, brackets, and parentheses.
+  - Trim the spaces at the end of the line.
+  - Add double spaces between sentences.
+
+Examples (positional arguments):
+  find . -type f -name "*.md" | xargs pfmt
+  pfmt *.md
+
+Examples (standard input):
+  pfmt <<(echo "some text to format...")
+  cat README.md | pfmt
+  echo "some text to format..." | pfmt
+```
+
 ## git-bump
 
 ```sh
-git-bump -h
+git-bump --help
 
 Bump the current tag version to the next version accordingly to semantic
-versioning specifications.
+versioning specifications
 
 Usage: git-bump [OPTIONS] --level <RELEASE_LEVEL>
 
 Arguments:
-  -l, --level <RELEASE_LEVEL>  The release level to bump tag [possible values: patch, minor, major]
+  -l, --level <RELEASE_LEVEL>
+          The release level to bump tag [possible values: patch, minor, major]
 
 Options:
-  -m, --message <MESSAGE>      Optional tag message
-  -d, --dry-run                Prints the next version without committing anything
-  -h, --help                   Print help information (use `--help` for more detail)
+  -m, --message <MESSAGE>
+          Optional tag message
+
+  -d, --dry-run
+          Prints the next version without committing anything
+
+  -h, --help
+          Print help information (use `-h` for a summary)
 
 Examples:
   git-bump -l patch -m "version %T"
@@ -46,6 +92,7 @@ Examples:
 
 # future scripts
 
+- [x] `pfmt` - Format plain text with sd.
 - [x] `git-bump` - Bump the current tag version to the next version accordingly to
   semantic versioning specifications.
 - [ ] `git-dirty` - Recursively check your local git repositories for unstaged files.
