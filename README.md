@@ -8,13 +8,13 @@ This is my collection of useful shell scripts for Linux and Mac.
 
 To install all the scripts, run:
 
-```sh
+```txt
 make dependencies symlink
 ```
 
 To uninstall all the scripts, you can run:
 
-```sh
+```txt
 make unsymlink
 ```
 
@@ -22,7 +22,7 @@ make unsymlink
 
 ## pfmt
 
-```sh
+```txt
 pfmt --help
 
 Format plain text with sd.
@@ -62,7 +62,7 @@ Examples (standard input):
 
 ## git-bump
 
-```sh
+```txt
 git-bump --help
 
 Bump the current tag version to the next version accordingly to semantic
@@ -106,7 +106,7 @@ To enable shell completion, copy the files to one of your `$fpath` directories.
 
 # make recipes
 
-```sh
+```txt
 make help
 
 all-check      Run all checks

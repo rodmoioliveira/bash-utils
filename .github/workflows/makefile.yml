@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 env:
-  TRACE: 1
+  TRACE: 0
 
 jobs:
   tests:

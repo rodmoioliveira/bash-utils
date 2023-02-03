@@ -21,13 +21,13 @@ This is my collection of useful shell scripts for Linux and Mac.
 
 To install all the scripts, run:
 
-\`\`\`sh
+\`\`\`txt
 make dependencies symlink
 \`\`\`
 
 To uninstall all the scripts, you can run:
 
-\`\`\`sh
+\`\`\`txt
 make unsymlink
 \`\`\`
 
@@ -35,7 +35,7 @@ make unsymlink
 
 ## pfmt
 
-\`\`\`sh
+\`\`\`txt
 pfmt --help
 
 $(./scripts/pfmt 2>&1 --help)
@@ -43,7 +43,7 @@ $(./scripts/pfmt 2>&1 --help)
 
 ## git-bump
 
-\`\`\`sh
+\`\`\`txt
 git-bump --help
 
 $(./scripts/git-bump 2>&1 --help)
@@ -65,7 +65,7 @@ To enable shell completion, copy the files to one of your \`\$fpath\` directorie
 
 # make recipes
 
-\`\`\`sh
+\`\`\`txt
 make help
 
 $(make help)

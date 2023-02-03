@@ -5,7 +5,7 @@
 ## TITLE:         pfmt
 ## AUTHOR:        Rodolfo Mói de Oliveira
 ## DESCRIPTION:   Format plain text with sd.
-## DATE:          27. Jan. 2023
+## DATE:          03. Fev. 2023
 ## LICENSE:       MIT
 ##
 #########################################################################
@@ -82,6 +82,12 @@ EOF
   printf 1>&2 "%s\n" "${help_text}"
 }
 
+error_no_input() {
+  printf 1>&2 "No FILE or TEXT to format...\n"
+  printf 1>&2 "\nFor more information try '--help'\n"
+  exit 1
+}
+
 args_parse() {
   local args
   if ! args=$(getopt -a -n pfmt -o h --long help -- "$@"); then
@@ -113,8 +119,7 @@ args_parse() {
     is_stdin=true
     input="$(cat -)"
     if [[ -z "${input}" ]]; then
-      usage_long
-      exit 0
+      error_no_input
     fi
 
   else
@@ -122,14 +127,18 @@ args_parse() {
     input=()
     while IFS= read -r i; do input+=("${i}"); done < <(echo "$@")
     if [[ -z "${input[*]}" ]]; then
-      usage_long
-      exit 0
+      error_no_input
     fi
   fi
 
 }
 
 apply_positional() {
+  # shellcheck disable=SC2048,SC2086
+  for i in ${input[*]}; do
+    printf 1>&2 "Formatting %s\n" "${i}"
+  done
+
   # - Enforce a single space between words.
   # shellcheck disable=SC2048,SC2086
   sd '(\w) {2,}(\w)' '${1} ${2}' ${input[*]}
@@ -167,6 +176,8 @@ apply_positional() {
   # - Add double spaces between sentences.
   # shellcheck disable=SC2048,SC2086
   sd '([^A-Z0-9][\.\?!]) {0,}([A-Z])' '$1  $2' ${input[*]}
+
+  printf 1>&2 "Done!\n"
 }
 
 apply_stdin() {
