@@ -4,7 +4,19 @@
 
 This is my collection of useful shell scripts for Linux and Mac.
 
-## Installation
+# index
+
+- [installation](https://github.com/rodmoioliveira/bash-utils#installation)
+- [scripts descriptions](https://github.com/rodmoioliveira/bash-utils#scripts-descriptions)
+  - [git-bump](https://github.com/rodmoioliveira/bash-utils#git-bump)
+  - [pfmt](https://github.com/rodmoioliveira/bash-utils#pfmt)
+- [future scripts](https://github.com/rodmoioliveira/bash-utils#future-scripts)
+- [completions](https://github.com/rodmoioliveira/bash-utils#completions)
+- [make recipes](https://github.com/rodmoioliveira/bash-utils#make-recipes)
+- [style](https://github.com/rodmoioliveira/bash-utils#style)
+- [reference](https://github.com/rodmoioliveira/bash-utils#reference)
+
+# installation
 
 To install all the scripts, run:
 
@@ -18,7 +30,37 @@ To uninstall all the scripts, you can run:
 make unsymlink
 ```
 
-# available scripts
+# scripts descriptions
+
+## git-bump
+
+```txt
+git-bump --help
+
+Bump the current tag version to the next version accordingly to semantic
+versioning specifications
+
+Usage: git-bump [OPTIONS] --level <RELEASE_LEVEL>
+
+Arguments:
+  -l, --level <RELEASE_LEVEL>
+          The release level to bump tag [possible values: patch, minor, major]
+
+Options:
+  -m, --message <MESSAGE>
+          Optional tag message
+
+  -d, --dry-run
+          Prints the next version without committing anything
+
+  -h, --help
+          Print help information (use `-h` for a summary)
+
+Examples:
+  git-bump -l patch -m "version %T"
+  git-bump -l minor -d
+  git-bump -l major
+```
 
 ## pfmt
 
@@ -60,43 +102,14 @@ Examples (standard input):
   echo "some text to format..." | pfmt
 ```
 
-## git-bump
-
-```txt
-git-bump --help
-
-Bump the current tag version to the next version accordingly to semantic
-versioning specifications
-
-Usage: git-bump [OPTIONS] --level <RELEASE_LEVEL>
-
-Arguments:
-  -l, --level <RELEASE_LEVEL>
-          The release level to bump tag [possible values: patch, minor, major]
-
-Options:
-  -m, --message <MESSAGE>
-          Optional tag message
-
-  -d, --dry-run
-          Prints the next version without committing anything
-
-  -h, --help
-          Print help information (use `-h` for a summary)
-
-Examples:
-  git-bump -l patch -m "version %T"
-  git-bump -l minor -d
-  git-bump -l major
-```
-
 # future scripts
 
-- [x] `pfmt` - Format plain text with sd.
+- [ ] `fm` - Filter and transform text and files accordingly predefined regex rules.
 - [x] `git-bump` - Bump the current tag version to the next version accordingly to
   semantic versioning specifications.
 - [ ] `git-dirty` - Recursively check your local git repositories for unstaged files.
 - [ ] `git-changelog` - Recursively generate CHANGELOG files for your git repositories.
+- [x] `pfmt` - Format plain text with sd.
 
 # completions
 
