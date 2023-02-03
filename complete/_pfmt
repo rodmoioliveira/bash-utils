@@ -1,0 +1,9 @@
+#compdef pfmt
+
+_pfmt() {
+  _arguments -s \
+    '*:input arg:_files' \
+    '(: - *)'{-h,--help}'[Print help information]'
+}
+
+_pfmt "$@"

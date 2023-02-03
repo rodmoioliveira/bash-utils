@@ -1,0 +1,109 @@
+#!/bin/bash
+
+source './tests/assert.sh'
+
+declare TRACE
+[[ "${TRACE}" == 1 ]] && set -o xtrace
+set -o errexit
+set -o nounset
+set -o pipefail
+# set -o noclobber
+
+clean_tempdir() {
+  rm -rf "${tmp_dir}"
+}
+
+trap clean_tempdir EXIT
+
+mktempdir() {
+  if ! tmp_dir=$(mktemp -d -t bash-utils-tests-XXXXXXXXXX); then
+    printf 1>&2 "Couldn't create %s\n" "${tmp_dir}"
+    exit 1
+  fi
+
+  cd "${tmp_dir}" || exit 1
+  printf 1>&2 "%s\n" "${tmp_dir}"
+}
+
+initial_setup() {
+  text_before=$(
+    cat <<"EOF"
+# Single space between words
+Edit the  Expression & Text to               see matches. Roll    over matches or the expression for details. PCRE & JavaScript flavors of RegEx are supported. Validate your expression with Tests mode.
+
+# Tidy punctuation
+Edit the Expression & Text to see matches   . Roll over matches or the expression for details   ? PCRE & JavaScript flavors,      of RegEx are supported. Validate       :  your expression with Tests mode              !
+
+# Tidy square brackets, brackets, parentheses
+Edit the [     Expression  ]   & Text to {     see     matches    }   . [ Roll              over  ]  matches or the (   expression   )    for {details}   ? PCRE & JavaScript flavors,      of RegEx are supported. Validate       :  your expression with Tests mode              !
+
+# Trim spaces at end of line
+Explore results with the Tools below. Replace & List output custom results. Details lists capture groups. Explain describes your expression in plain English.            
+
+# Double space between sentences
+RegExr was created by gskinner.com.
+
+Edit the Expression & Text to see matches.Roll over matches or the expression for details.PCRE & JavaScript flavors of RegEx are supported?Validate your expression with Tests mode.
+
+The side bar includes a Cheatsheet          , full Reference, and Help!              You can also Save & Share with the Community and view patterns you create or favorite in My Patterns.
+
+Explore results with the Tools below.Replace & List output custom results. Details lists capture groups.            Explain describes your expression in plain English.
+1. Explore results with the Tools below.Replace & List output custom results. Details lists capture groups.            Explain describes your expression in plain English.
+EOF
+  )
+
+  text_expected=$(
+    cat <<"EOF"
+# Single space between words
+Edit the Expression & Text to see matches.  Roll over matches or the expression for details.  PCRE & JavaScript flavors of RegEx are supported.  Validate your expression with Tests mode.
+
+# Tidy punctuation
+Edit the Expression & Text to see matches.  Roll over matches or the expression for details?  PCRE & JavaScript flavors, of RegEx are supported.  Validate: your expression with Tests mode!
+
+# Tidy square brackets, brackets, parentheses
+Edit the [Expression] & Text to {see matches}. [Roll over] matches or the (expression) for {details}?  PCRE & JavaScript flavors, of RegEx are supported.  Validate: your expression with Tests mode!
+
+# Trim spaces at end of line
+Explore results with the Tools below.  Replace & List output custom results.  Details lists capture groups.  Explain describes your expression in plain English.
+
+# Double space between sentences
+RegExr was created by gskinner.com.
+
+Edit the Expression & Text to see matches.  Roll over matches or the expression for details.  PCRE & JavaScript flavors of RegEx are supported?  Validate your expression with Tests mode.
+
+The side bar includes a Cheatsheet, full Reference, and Help!  You can also Save & Share with the Community and view patterns you create or favorite in My Patterns.
+
+Explore results with the Tools below.  Replace & List output custom results.  Details lists capture groups.  Explain describes your expression in plain English.
+1. Explore results with the Tools below.  Replace & List output custom results.  Details lists capture groups.  Explain describes your expression in plain English.
+EOF
+  )
+
+  echo "${text_before}" >text_before.md
+  echo "${text_expected}" >text_expected.md
+}
+
+assertions() {
+  initial_setup
+
+  # shellcheck disable=SC2002
+  assert_eq 0 "$(diff text_expected.md <(cat text_before.md | pfmt) | wc -l | awk '{print $1}')" "(pfmt) diff from standard input (cat) should be 0"
+  assert_eq 0 "$(diff text_expected.md <(echo "${text_before}" | pfmt) | wc -l | awk '{print $1}')" "(pfmt) diff from standard input (echo) should be 0"
+
+  fd text_before.md | xargs pfmt
+  assert_eq 0 "$(diff text_expected.md text_before.md | wc -l | awk '{print $1}')" "(pfmt) diff from positional arguments (fd | xargs pfmt) should be 0"
+
+  initial_setup
+
+  pfmt text_before.md
+  assert_eq 0 "$(diff text_expected.md text_before.md | wc -l | awk '{print $1}')" "(pfmt) diff from positional arguments (pfmt FILE) should be 0"
+}
+
+test() {
+  printf "============================================================\n"
+  printf "testing (pfmt)\n"
+  printf "============================================================\n"
+  mktempdir
+  assertions
+}
+
+test
