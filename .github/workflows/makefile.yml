@@ -23,7 +23,7 @@ jobs:
     - uses: actions/checkout@v3
 
     - name: Install dependencies alpine:latest
-      run: make dependencies
+      run: apk upgrade --no-cache && apk add --no-cache bash openssl libgcc libstdc++ ncurses-libs make && make dependencies
 
     - name:  Check format bash code alpine:latest
       run: make fmt-check
