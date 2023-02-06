@@ -24,6 +24,7 @@ install_linux() {
   curl -sS https://webi.sh/shfmt | sh
   eval "${package_manager} shellcheck"
   curl https://sh.rustup.rs -sSf | sh -s -- -y
+  source "$HOME/.cargo/env"
   cargo install sd
   cargo install fd-find
   cargo install ripgrep
