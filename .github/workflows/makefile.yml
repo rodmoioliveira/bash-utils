@@ -11,7 +11,7 @@ env:
 
 jobs:
   tests-linux:
-    name: '[bash-utils] Test on ${{ matrix.distro }}'
+    name: '[bash-utils] Test on ${{ matrix.image.distro }}'
 
     runs-on: 'ubuntu-latest'
 
@@ -28,22 +28,22 @@ jobs:
     steps:
     - uses: actions/checkout@v3
 
-    - name: Install dependencies ${{ matrix.distro }}
+    - name: Install dependencies ${{ matrix.image.distro }}
       run: make dependencies
 
-    - name:  Check format bash code ${{ matrix.distro }}
+    - name:  Check format bash code ${{ matrix.image.distro }}
       run: make fmt-check
 
-    - name:  Check lint bash code ${{ matrix.distro }}
+    - name:  Check lint bash code ${{ matrix.image.distro }}
       run: make lint-check
 
-    - name: Check typos ${{ matrix.distro }}
+    - name: Check typos ${{ matrix.image.distro }}
       run: make typos
 
-    - name: Add symlink to scripts in path ${{ matrix.distro }}
+    - name: Add symlink to scripts in path ${{ matrix.image.distro }}
       run: make symlink
 
-    - name: Run tests ${{ matrix.distro }}
+    - name: Run tests ${{ matrix.image.distro }}
       run: source ~/.bash_profile; make tests
 
   tests-mac:
