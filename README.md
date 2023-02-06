@@ -97,9 +97,9 @@ Examples (positional arguments):
   pfmt *.md
 
 Examples (standard input):
-  pfmt <<(echo "some text to format...")
+  pfmt <<(echo "some     text to     format    ...")
   cat README.md | pfmt
-  echo "some text to format..." | pfmt
+  echo "some     text to     format    ..." | pfmt
 ```
 
 # future scripts
