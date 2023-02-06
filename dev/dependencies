@@ -1,9 +1,28 @@
 #!/bin/bash
 
+declare TRACE
+[[ "${TRACE}" == 1 ]] && set -o xtrace
+
+id_distro() {
+  declare -A osInfo
+  osInfo["/etc/debian_version"]="apt-get install -y"
+  osInfo["/etc/alpine-release"]="apk --update add"
+  osInfo["/etc/centos-release"]="yum install -y"
+  osInfo["/etc/fedora-release"]="dnf install -y"
+  osInfo["/etc/arch-version"]=""
+  osInfo["/etc/SuSE-release"]=""
+  osInfo["/etc/gentoo-release"]=""
+
+  for f in "${!osInfo[@]}"; do
+    if [[ -f "${f}" ]]; then
+      package_manager=${osInfo["${f}"]}
+    fi
+  done
+}
+
 install_linux() {
-  curl -sL https://git.io/_has | sudo tee /usr/local/bin/has >/dev/null && sudo chmod +x /usr/local/bin/has
   curl -sS https://webi.sh/shfmt | sh
-  sudo apt-get install shellcheck -y
+  eval "${package_manager} shellcheck"
   curl https://sh.rustup.rs -sSf | sh -s -- -y
   cargo install sd
   cargo install fd-find
@@ -14,7 +33,6 @@ install_linux() {
 }
 
 install_mac() {
-  brew install kdabir/tap/has
   brew install shellcheck
   brew install shfmt
   brew install sd
@@ -32,6 +50,7 @@ install_mac() {
 install() {
   case "${OS}" in
   Linux)
+    id_distro
     install_linux
     ;;
   Mac)
