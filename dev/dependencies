@@ -9,9 +9,7 @@ id_distro() {
   osInfo["/etc/alpine-release"]="apk --update add"
   osInfo["/etc/centos-release"]="yum install -y"
   osInfo["/etc/fedora-release"]="dnf install -y"
-  osInfo["/etc/arch-version"]=""
-  osInfo["/etc/SuSE-release"]=""
-  osInfo["/etc/gentoo-release"]=""
+  osInfo["/etc/arch-version"]="pacman -S --noconfirm"
 
   for f in "${!osInfo[@]}"; do
     if [[ -f "${f}" ]]; then
@@ -21,6 +19,11 @@ id_distro() {
 }
 
 install_linux() {
+  printf 1>&2 "============================================"
+  printf 1>&2 "============================================"
+  uname -a
+  printf 1>&2 "============================================"
+  printf 1>&2 "============================================"
   curl -sS https://webi.sh/shfmt | sh
   eval "${package_manager} shellcheck"
   curl https://sh.rustup.rs -sSf | sh -s -- -y

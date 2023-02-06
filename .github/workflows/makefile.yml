@@ -18,9 +18,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
+        image:
           - { distro: 'ubuntu:latest' }
           - { distro: 'alpine:latest' }
+          # - { distro: 'centos:latest' }
+          # - { distro: 'fedora:latest' }
+          # - { distro: 'archlinux:latest' }
 
     steps:
     - uses: actions/checkout@v3
