@@ -10,36 +10,63 @@ env:
   TRACE: 0
 
 jobs:
-  tests:
-    name: '[bash-utils] Test on ${{ matrix.os }}'
-
+  container-job:
+    name: '[bash-utils] Test on alpine:latest'
     runs-on: ${{ matrix.os }}
-
+    container: alpine:latest
     strategy:
       fail-fast: false
-
       matrix:
         include:
           - { os: ubuntu-latest }
-          - { os: macos-latest }
-
     steps:
     - uses: actions/checkout@v3
 
-    - name: Install dependencies ${{ matrix.os }}
+    - name: Install dependencies alpine:latest
       run: make dependencies
 
-    - name:  Check format bash code ${{ matrix.os }}
+    - name:  Check format bash code alpine:latest
       run: make fmt-check
 
-    - name:  Check lint bash code ${{ matrix.os }}
+    - name:  Check lint bash code alpine:latest
       run: make lint-check
 
-    - name: Check typos ${{ matrix.os }}
+    - name: Check typos alpine:latest
       run: make typos
 
-    - name: Add symlink to scripts in path ${{ matrix.os }}
+    - name: Add symlink to scripts in path alpine:latest
       run: make symlink
 
-    - name: Run tests ${{ matrix.os }}
-      run: source ~/.bash_profile; make tests
+    - name: Run tests alpine:latest
+      run: make tests
+
+  # tests:
+  #   name: '[bash-utils] Test on ${{ matrix.os }}'
+  #   runs-on: ${{ matrix.os }}
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       include:
+  #         - { os: ubuntu-latest }
+  #         - { os: macos-latest }
+
+  #   steps:
+  #   - uses: actions/checkout@v3
+
+  #   - name: Install dependencies ${{ matrix.os }}
+  #     run: make dependencies
+
+  #   - name:  Check format bash code ${{ matrix.os }}
+  #     run: make fmt-check
+
+  #   - name:  Check lint bash code ${{ matrix.os }}
+  #     run: make lint-check
+
+  #   - name: Check typos ${{ matrix.os }}
+  #     run: make typos
+
+  #   - name: Add symlink to scripts in path ${{ matrix.os }}
+  #     run: make symlink
+
+  #   - name: Run tests ${{ matrix.os }}
+  #     run: source ~/.bash_profile; make tests

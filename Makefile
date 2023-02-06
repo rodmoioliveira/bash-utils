@@ -8,6 +8,8 @@ help: ## Display this help screen
 
 all-check: fmt-check lint-check readme typos tests ## Run all checks
 
+docker-ci: | dependencies fmt-check lint-check typos symlink tests ## Run docker ci
+
 dependencies: ## Install dependencies
 	@./dev/dependencies
 
@@ -40,6 +42,7 @@ typos-fix: ## Fix typos
 
 .PHONY: help
 .PHONY: all-check
+.PHONY: ci
 .PHONY: dependencies
 .PHONY: fmt
 .PHONY: fmt-check
