@@ -2,7 +2,8 @@
 
 [![Makefile CI](https://github.com/rodmoioliveira/bash-utils/actions/workflows/makefile.yml/badge.svg)](https://github.com/rodmoioliveira/bash-utils/actions/workflows/makefile.yml)
 
-This is my collection of useful shell scripts for Linux and Mac.
+This is my collection of useful shell scripts for Linux (ubuntu-latest) and Mac
+(macos-latest).
 
 # index
 
