@@ -124,6 +124,7 @@ make help
 
 all-check      Run all checks
 dependencies   Install dependencies
+docker-ci      Run docker ci
 fmt-check      Check format bash code
 fmt            Format bash code
 help           Display this help screen

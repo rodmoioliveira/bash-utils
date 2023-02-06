@@ -13,6 +13,7 @@ id_distro() {
 
   for f in "${!osInfo[@]}"; do
     if [[ -f "${f}" ]]; then
+      distro="${f}"
       package_manager=${osInfo["${f}"]}
     fi
   done
@@ -24,6 +25,18 @@ install_linux() {
   cat /etc/os-release
   printf "============================================\n"
   printf "============================================\n"
+
+  case "${distro}" in
+  /etc/debian_version) ;;
+  /etc/alpine-release)
+    apk upgrade --no-cache && apk add --no-cache bash openssl libgcc libstdc++ ncurses-libs make curl build-base git
+    ;;
+  /etc/centos-release) ;;
+  /etc/fedora-release) ;;
+  /etc/arch-version) ;;
+  *) ;;
+  esac
+
   curl -sS https://webi.sh/shfmt | sh
   eval "${package_manager} shellcheck"
   curl https://sh.rustup.rs -sSf | sh -s -- -y
