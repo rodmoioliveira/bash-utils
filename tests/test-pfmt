@@ -79,6 +79,8 @@ EOF
   )
 
   echo "${text_before}" >text_before.md
+  echo "${text_before}" >text_before2.md
+  echo "${text_before}" >text_before3.md
   echo "${text_expected}" >text_expected.md
 }
 
@@ -86,16 +88,30 @@ assertions() {
   initial_setup
 
   # shellcheck disable=SC2002
-  assert_eq 0 "$(diff text_expected.md <(cat text_before.md | pfmt) | wc -l | awk '{print $1}')" "(pfmt) diff from standard input (cat) should be 0"
-  assert_eq 0 "$(diff text_expected.md <(echo "${text_before}" | pfmt) | wc -l | awk '{print $1}')" "(pfmt) diff from standard input (echo) should be 0"
+  assert_eq 0 \
+    "$(diff text_expected.md <(cat text_before.md | pfmt) | wc -l | awk '{print $1}')" \
+    "(pfmt) diff from standard input (cat) should be 0"
+  assert_eq 0 \
+    "$(diff text_expected.md <(echo "${text_before}" | pfmt) | wc -l | awk '{print $1}')" \
+    "(pfmt) diff from standard input (echo) should be 0"
 
-  fd text_before.md | xargs pfmt
-  assert_eq 0 "$(diff text_expected.md text_before.md | wc -l | awk '{print $1}')" "(pfmt) diff from positional arguments (fd | xargs pfmt) should be 0"
+  fd text_before | xargs pfmt
+  assert_eq \
+    0 "$(diff text_expected.md text_before.md | wc -l | awk '{print $1}')" \
+    "(pfmt text_before.md) diff from positional arguments (fd | xargs pfmt) should be 0"
+  assert_eq 0 \
+    "$(diff text_expected.md text_before2.md | wc -l | awk '{print $1}')" \
+    "(pfmt text_before2.md) diff from positional arguments (fd | xargs pfmt) should be 0"
+  assert_eq 0 \
+    "$(diff text_expected.md text_before3.md | wc -l | awk '{print $1}')" \
+    "(pfmt text_before3.md) diff from positional arguments (fd | xargs pfmt) should be 0"
 
   initial_setup
 
   pfmt text_before.md
-  assert_eq 0 "$(diff text_expected.md text_before.md | wc -l | awk '{print $1}')" "(pfmt) diff from positional arguments (pfmt FILE) should be 0"
+  assert_eq 0 \
+    "$(diff text_expected.md text_before.md | wc -l | awk '{print $1}')" \
+    "(pfmt) diff from positional arguments (pfmt FILE) should be 0"
 }
 
 test() {

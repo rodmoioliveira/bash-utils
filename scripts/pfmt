@@ -121,7 +121,6 @@ args_parse() {
     if [[ -z "${input}" ]]; then
       error_no_input
     fi
-
   else
     is_stdin=false
     input=()
