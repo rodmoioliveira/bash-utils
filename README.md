@@ -71,12 +71,12 @@ pfmt --help
 Format plain text with sd.
 
 Usage:
-  pfmt [OPTIONS] [FILES]...
+  pfmt [OPTIONS] <FILES>...
   pfmt [OPTIONS] <<(echo <TEXT>)
 
 Arguments:
-  [FILES]...
-          A list of space-separated FILES as positional arguments
+  <FILES>...
+          A list of space-separated FILES as positional arguments, or
 
   <TEXT>
           A TEXT from standard input
