@@ -172,7 +172,7 @@ git_dir_check() {
   local -r is_git_dir=$(git rev-parse --git-dir 2>/dev/null)
 
   if [[ -n "${is_git_dir}" ]]; then
-    CURRENT_VERSION=$(git tag -l | tail -n1)
+    CURRENT_VERSION=$(git -P tag --sort=taggerdate --format '%(tag)' | tail -n1)
   else
     error_not_git_dir
   fi
