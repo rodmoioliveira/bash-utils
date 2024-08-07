@@ -22,8 +22,8 @@ usage_short() {
   local help_text
   help_text=$(
     cat <<"EOF"
-Bump the current tag version to the next version accordingly to semantic
-versioning specifications.
+Bump the current tag version to the next version according to the semantic
+versioning specifications
 
 Usage: git-bump [OPTIONS] --level <RELEASE_LEVEL>
 
@@ -49,7 +49,7 @@ usage_long() {
   local help_text
   help_text=$(
     cat <<"EOF"
-Bump the current tag version to the next version accordingly to semantic
+Bump the current tag version to the next version according to the semantic
 versioning specifications
 
 Usage: git-bump [OPTIONS] --level <RELEASE_LEVEL>
