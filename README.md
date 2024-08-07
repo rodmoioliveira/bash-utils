@@ -38,7 +38,7 @@ make unsymlink
 ```txt
 git-bump --help
 
-Bump the current tag version to the next version accordingly to semantic
+Bump the current tag version to the next version according to the semantic
 versioning specifications
 
 Usage: git-bump [OPTIONS] --level <RELEASE_LEVEL>
