@@ -1,3 +1,8 @@
+# IMPORTANT!
+
+This project is not under active development and was superseded by my
+[dotfiles](https://github.com/rodmoioliveira/.dotfiles).
+
 # bash-utils
 
 [![Makefile CI](https://github.com/rodmoioliveira/bash-utils/actions/workflows/makefile.yml/badge.svg)](https://github.com/rodmoioliveira/bash-utils/actions/workflows/makefile.yml)
